@@ -21,7 +21,7 @@
 <img src="https://raw.githubusercontent.com/HeyHeyChicken/My-LaMetric-Time-Android/main/resources/Installation_2.png">
 4) Your project will be downloaded and opened. Click on "Trust Project".
 <img src="https://raw.githubusercontent.com/HeyHeyChicken/My-LaMetric-Time-Android/main/resources/Installation_3.png">
-5) <a href="https://duckduckgo.com/?q=android+enable+usb+debugging">Enable USB Debugging on your device</a>.
+5) <a href="https://duckduckgo.com/?q=android+enable+usb+debugging">Enable USB Debugging on your device</a>.<br/>
 6) Connect your device to your computer, then click on "Run app". The app will be installed on your device.
 
 ## Usage
