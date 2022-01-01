@@ -16,9 +16,11 @@
 
 1) Install and open Android Studio.
 2) Click on "Get from VCS".
-<img src="https://raw.githubusercontent.com/HeyHeyChicken/My-LaMetric-Time-Android/main/resources/Installation_1.png" width="300">
+<img src="https://raw.githubusercontent.com/HeyHeyChicken/My-LaMetric-Time-Android/main/resources/Installation_1.png">
 3) Paste "https://github.com/HeyHeyChicken/My-LaMetric-Time-Android" in the URL field then click "Clone".
+<img src="https://raw.githubusercontent.com/HeyHeyChicken/My-LaMetric-Time-Android/main/resources/Installation_2.png">
 4) Your project will be downloaded and opened. Click on "Trust Project".
+<img src="https://raw.githubusercontent.com/HeyHeyChicken/My-LaMetric-Time-Android/main/resources/Installation_3.png">
 5) <a href="https://duckduckgo.com/?q=android+enable+usb+debugging">Enable USB Debugging on your device</a>.
 6) Connect your device to your computer, then click on "Run app". The app will be installed on your device.
 
