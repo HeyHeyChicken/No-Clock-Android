@@ -6,7 +6,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
-import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -40,7 +39,6 @@ public class FullscreenActivity extends AppCompatActivity {
     private SharedPreferences sharedPref;
     private FrameLayout SettingsLayout;
     public WebView MyWebView;
-    private SensorManager mSensorManager;
 
     public class MyJavascriptInterface {
         private FullscreenActivity MyActivity;
@@ -125,8 +123,6 @@ public class FullscreenActivity extends AppCompatActivity {
         Button button = findViewById(R.id.button);
 
         mContentView = binding.fullscreenContent;
-
-        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
 
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
