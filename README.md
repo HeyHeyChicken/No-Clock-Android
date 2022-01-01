@@ -14,8 +14,8 @@
 
 ## Installation
 
-1) Install and open Android Studio.
-2) Click on "Get from VCS".
+1) Install and open Android Studio.<br/>
+2) Click on "Get from VCS".<br/>
 <img src="https://raw.githubusercontent.com/HeyHeyChicken/My-LaMetric-Time-Android/main/resources/Installation_1.png">
 3) Paste "https://github.com/HeyHeyChicken/My-LaMetric-Time-Android" in the URL field then click "Clone".
 <img src="https://raw.githubusercontent.com/HeyHeyChicken/My-LaMetric-Time-Android/main/resources/Installation_2.png">
