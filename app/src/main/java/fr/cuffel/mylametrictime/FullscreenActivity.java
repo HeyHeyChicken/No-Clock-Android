@@ -5,10 +5,7 @@ import android.annotation.SuppressLint;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -16,7 +13,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowInsets;
@@ -27,11 +23,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
-
-import java.io.IOException;
 
 import fr.cuffel.mylametrictime.databinding.ActivityFullscreenBinding;
 
@@ -156,20 +149,6 @@ public class FullscreenActivity extends AppCompatActivity {
         });
     }
 
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        if(sensor.getType() == Sensor.TYPE_LIGHT){
-            Log.i("Sensor Changed", "Accuracy :" + accuracy);
-        }
-
-    }
-
-    public void onSensorChanged(SensorEvent event) {
-        if( event.sensor.getType() == Sensor.TYPE_LIGHT){
-            Log.i("Sensor Changed", "onSensor Change :" + event.values[0]);
-        }
-
-    }
-
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -190,7 +169,7 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     private void LoadURL(String _url){
-        Log.d("-------> LOADING", _url);
+        //Log.d("-------> LOADING", _url);
         this.SettingsLayout.setVisibility(View.GONE);
         this.MyWebView.loadUrl(_url);
     }
