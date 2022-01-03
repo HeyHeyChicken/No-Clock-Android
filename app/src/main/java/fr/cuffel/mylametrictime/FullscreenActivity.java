@@ -79,8 +79,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 os.close();
             }
             else if(httpExchange.getRequestMethod().equals("POST")){
-                String response = "Notification sended !";
-                httpExchange.sendResponseHeaders(200, response.length());//response code and length
+                String response = "Notification sended";
 
                 // GET REQ BODY
                 InputStreamReader isr =  new InputStreamReader(httpExchange.getRequestBody() ,"utf-8");
@@ -95,6 +94,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
                 try {
                     JSONObject json = new JSONObject(buf.toString());
+                    response += " : " + json.toString();
 
                     MyWebView.post(new Runnable() {
                         @Override
@@ -105,6 +105,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                httpExchange.sendResponseHeaders(200, response.length());//response code and length
 
                 OutputStream os = httpExchange.getResponseBody();
                 os.write(response.getBytes());
