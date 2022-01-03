@@ -16,6 +16,9 @@
 
 ## Method 1
 
+1) Download the latest version of the application in the "<a href="https://github.com/HeyHeyChicken/My-LaMetric-Time-Android/tree/main/releases">release</a>" folder from your android device.
+2) Install the application from the APK file on your android device.
+
 ## Method 2
 
 1) Install and open Android Studio.
@@ -32,8 +35,8 @@
 # Usage
 
 1) Launch the app on your device.
-2) Enter your server URL in the field provided and click OK.
-If you need to change the URL settings, just clean the app's data and cache.
+2) You can access the settings file by pressing the back button on your anroid device.
+Press back again to save.
 
 # Features
 
