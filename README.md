@@ -12,7 +12,11 @@
 
 <br>
 
-## Installation
+# Installation
+
+## Method 1
+
+## Method 2
 
 1) Install and open Android Studio.
 2) Click on "Get from VCS".
@@ -25,17 +29,17 @@
 6) Connect your device to your computer, then click on "Run app". The app will be installed on your device.
 <img src="https://raw.githubusercontent.com/HeyHeyChicken/My-LaMetric-Time-Android/main/resources/Installation_4.png">
 
-## Usage
+# Usage
 
 1) Launch the app on your device.
 2) Enter your server URL in the field provided and click OK.
 If you need to change the URL settings, just clean the app's data and cache.
 
-## Features
+# Features
 
 Have a look at the <a href="https://github.com/HeyHeyChicken/My-LaMetric-Time#features">My Lametric Time</a> project's features.
 
-## Compatibility
+# Compatibility
 
 **My LaMetric Time Android** has only been officially tested on a OnePlus 6T.
 
