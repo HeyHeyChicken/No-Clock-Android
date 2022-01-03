@@ -4,10 +4,7 @@ import android.annotation.SuppressLint;
 import android.webkit.JavascriptInterface;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -41,10 +38,8 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
 import fr.cuffel.mylametrictime.databinding.ActivityFullscreenBinding;
-import android.os.PowerManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -62,7 +57,6 @@ public class FullscreenActivity extends AppCompatActivity {
     private final Handler mHideHandler = new Handler();
     private View mContentView;
     private ActivityFullscreenBinding binding;
-    private SharedPreferences sharedPref;
     private FrameLayout SettingsLayout;
     public WebView MyWebView;
     private HttpServer mHttpServer;
@@ -144,7 +138,6 @@ public class FullscreenActivity extends AppCompatActivity {
     private class DownloadTask extends AsyncTask<String, Integer, String> {
 
         private Context context;
-        private PowerManager.WakeLock mWakeLock;
 
         public DownloadTask(Context context) {
             this.context = context;
@@ -163,8 +156,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 // expect HTTP 200 OK, so we don't mistakenly save error report
                 // instead of the file
                 if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                    return "Server returned HTTP " + connection.getResponseCode()
-                            + " " + connection.getResponseMessage();
+                    return "Server returned HTTP " + connection.getResponseCode() + " " + connection.getResponseMessage();
                 }
 
                 // this will be useful to display download percentage
@@ -327,6 +319,37 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        /*
+        File file = new File(getFilesDir().getAbsolutePath() + "/My-LaMetric-Time-main/settings.json");
+        if(file.exists()){
+            try {
+                String content = ReadTextFile(file);
+                Log.d("------>", content);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        */
+    }
+
+    public String ReadTextFile(File file) throws IOException {
+        String string = "";
+        InputStream is = new FileInputStream(file);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        while (true) {
+            try {
+                if ((string = reader.readLine()) == null) break;
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        is.close();
+        return string;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MyContext = this;
@@ -354,8 +377,7 @@ public class FullscreenActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        sharedPref = getSharedPreferences("myPref", MODE_PRIVATE);
-
+        //sharedPref = getSharedPreferences("myPref", MODE_PRIVATE);
 
         File file = new File(getFilesDir().getAbsolutePath() + "/main.zip");
         if(!file.exists()){
