@@ -35,34 +35,31 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/input"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    app:boxCornerRadiusBottomEnd="5dp"
-                    app:boxCornerRadiusBottomStart="5dp"
-                    app:boxCornerRadiusTopEnd="5dp"
-                    app:boxCornerRadiusTopStart="5dp">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:layout_marginRight="30dp"
-                        android:hint="http://localhost:80"
-                        android:maxLines="2" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <Button
-                    android:id="@+id/button"
+                <TextView
+                    android:id="@+id/step1"
                     android:layout_width="wrap_content"
-                    android:layout_height="67dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:backgroundTint="#1ea6ff"
-                    android:text="OK"
-                    android:translationY="-19dp" />
+                    android:text="Download My LaMetric Tile from GitHub"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/step2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Unzip archive"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/step3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Start web server"
+                    android:textColor="#FFFFFF" />
 
             </LinearLayout>
 
