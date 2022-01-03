@@ -69,6 +69,22 @@
     <WebView
         android:id="@+id/webview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        tools:visibility="visible">
+
+    </WebView>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/jsonsettings"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:hint="settings.json"
+        tools:visibility="gone">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="hint" />
+    </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>

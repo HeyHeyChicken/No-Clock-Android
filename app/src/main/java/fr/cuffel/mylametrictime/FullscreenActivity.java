@@ -1,6 +1,7 @@
 package fr.cuffel.mylametrictime;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.webkit.JavascriptInterface;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,14 +26,21 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
+
+import com.google.android.material.textfield.TextInputLayout;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -62,7 +70,9 @@ public class FullscreenActivity extends AppCompatActivity {
     private HttpServer mHttpServer;
     private int WebServerPort = 5000;
     private int Green = Color.parseColor("#FF4CAF50");
-    private Context MyContext;
+    private boolean IsSettingsPannelOpen = false;
+    private SharedPreferences MySharedPreferences;
+
     private HttpHandler rootHandler = new HttpHandler() {
         @Override
         public void handle(HttpExchange httpExchange) throws IOException {
@@ -79,7 +89,8 @@ public class FullscreenActivity extends AppCompatActivity {
                 os.close();
             }
             else if(httpExchange.getRequestMethod().equals("POST")){
-                String response = "Notification sended";
+                String response = "Notification sended !";
+                httpExchange.sendResponseHeaders(200, response.length());//response code and length
 
                 // GET REQ BODY
                 InputStreamReader isr =  new InputStreamReader(httpExchange.getRequestBody() ,"utf-8");
@@ -94,7 +105,6 @@ public class FullscreenActivity extends AppCompatActivity {
 
                 try {
                     JSONObject json = new JSONObject(buf.toString());
-                    response += " : " + json.toString();
 
                     MyWebView.post(new Runnable() {
                         @Override
@@ -105,7 +115,6 @@ public class FullscreenActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                httpExchange.sendResponseHeaders(200, response.length());//response code and length
 
                 OutputStream os = httpExchange.getResponseBody();
                 os.write(response.getBytes());
@@ -249,114 +258,14 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     };
 
-    private void startServer(int port) {
-        try {
-            InetSocketAddress inetSocketAddress = new InetSocketAddress(port);
-            mHttpServer = HttpServer.create(inetSocketAddress, 0);
-            mHttpServer.setExecutor(Executors.newCachedThreadPool());
-            mHttpServer.createContext("/", rootHandler);
-            //mHttpServer.createContext("/index", rootHandler);
-            mHttpServer.start();//start server;
-            Log.d("--------> ", "Server is running on " + mHttpServer.getAddress() + ":" + port);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private boolean unpackZip(String path, String zipname) {
-        InputStream is;
-        ZipInputStream zis;
-        try
-        {
-            String filename;
-            is = new FileInputStream(path + zipname);
-            zis = new ZipInputStream(new BufferedInputStream(is));
-            ZipEntry ze;
-            byte[] buffer = new byte[1024];
-            int count;
-
-            while ((ze = zis.getNextEntry()) != null)
-            {
-                filename = ze.getName();
-
-                // Need to create directories if not exists, or
-                // it will generate an Exception...
-                if (ze.isDirectory()) {
-                    File fmd = new File(path + filename);
-                    fmd.mkdirs();
-                    continue;
-                }
-
-                FileOutputStream fout = new FileOutputStream(path + filename);
-
-                while ((count = zis.read(buffer)) != -1)
-                {
-                    fout.write(buffer, 0, count);
-                }
-
-                fout.close();
-                zis.closeEntry();
-            }
-
-            zis.close();
-
-            TextView step2 = findViewById(R.id.step2);
-            step2.setTextColor(Green);
-
-            startServer(WebServerPort);
-
-            TextView step3 = findViewById(R.id.step3);
-            step3.setTextColor(Green);
-
-            LoadURL("http://localhost:" + WebServerPort + "/index.html");
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public void onBackPressed() {
-        /*
-        File file = new File(getFilesDir().getAbsolutePath() + "/My-LaMetric-Time-main/settings.json");
-        if(file.exists()){
-            try {
-                String content = ReadTextFile(file);
-                Log.d("------>", content);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        */
-    }
-
-    public String ReadTextFile(File file) throws IOException {
-        String string = "";
-        InputStream is = new FileInputStream(file);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        while (true) {
-            try {
-                if ((string = reader.readLine()) == null) break;
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        is.close();
-        return string;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MyContext = this;
 
         binding = ActivityFullscreenBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        MySharedPreferences = getSharedPreferences("myPrefs", MODE_PRIVATE);
 
         MyJavascriptInterface myInterface = new MyJavascriptInterface(this);
 
@@ -367,6 +276,16 @@ public class FullscreenActivity extends AppCompatActivity {
         this.MyWebView.setWebViewClient(new WebViewClient() {
             public void onPageFinished(WebView view, String url) {
                 MyWebView.evaluateJavascript("APP.android = true;", null);
+
+                String settings = MySharedPreferences.getString("settings", "null");
+                if(!settings.equals("null")){
+                    try {
+                        JSONObject json = new JSONObject(settings);
+                        MyWebView.evaluateJavascript("APP.setSettings(JSON.parse(\"" + json.getJSONObject("client").toString().replace("\"", "\\\"") + "\"));", null);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         });
 
@@ -423,5 +342,176 @@ public class FullscreenActivity extends AppCompatActivity {
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+
+    /**
+     * This function starts the web server.
+     * @param port
+     */
+    private void startServer(int port) {
+        try {
+            InetSocketAddress inetSocketAddress = new InetSocketAddress(port);
+            mHttpServer = HttpServer.create(inetSocketAddress, 0);
+            mHttpServer.setExecutor(Executors.newCachedThreadPool());
+            mHttpServer.createContext("/", rootHandler);
+            mHttpServer.start();//start server;
+            // Log.d("--------> ", "Server is running on " + mHttpServer.getAddress() + ":" + port);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * This function unzip an archive.
+     * @param path
+     * @param zipname
+     * @return
+     */
+    private boolean unpackZip(String path, String zipname) {
+        InputStream is;
+        ZipInputStream zis;
+        try
+        {
+            String filename;
+            is = new FileInputStream(path + zipname);
+            zis = new ZipInputStream(new BufferedInputStream(is));
+            ZipEntry ze;
+            byte[] buffer = new byte[1024];
+            int count;
+
+            while ((ze = zis.getNextEntry()) != null)
+            {
+                filename = ze.getName();
+
+                // Need to create directories if not exists, or
+                // it will generate an Exception...
+                if (ze.isDirectory()) {
+                    File fmd = new File(path + filename);
+                    fmd.mkdirs();
+                    continue;
+                }
+
+                FileOutputStream fout = new FileOutputStream(path + filename);
+
+                while ((count = zis.read(buffer)) != -1)
+                {
+                    fout.write(buffer, 0, count);
+                }
+
+                fout.close();
+                zis.closeEntry();
+            }
+
+            zis.close();
+
+            TextView step2 = findViewById(R.id.step2);
+            step2.setTextColor(Green);
+
+            startServer(WebServerPort);
+
+            TextView step3 = findViewById(R.id.step3);
+            step3.setTextColor(Green);
+
+            LoadURL("http://localhost:" + WebServerPort + "/index.html");
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * This function is executed when the user presses the "back" button on their device.
+     */
+    @Override
+    public void onBackPressed() {
+        String path = getFilesDir().getAbsolutePath() + "/My-LaMetric-Time-main/settings.json";
+        File file = new File(path);
+        if(file.exists()){
+            try {
+                TextInputLayout t = findViewById(R.id.jsonsettings);
+                IsSettingsPannelOpen = !IsSettingsPannelOpen;
+                if (IsSettingsPannelOpen) {
+                    String content = MySharedPreferences.getString("settings", ReadTextFile(file));
+
+                    JSONObject json = new JSONObject(content);
+                    json.put("serverPort",WebServerPort);
+
+                    t.getEditText().setText(json.toString(4));
+                    t.setVisibility(View.VISIBLE);
+                    MyWebView.setVisibility(View.GONE);
+                }
+                else{
+                    if(t.getEditText().getText().toString().length() > 0){
+                        String content = t.getEditText().getText().toString();
+
+                        try {
+                            JSONObject json = new JSONObject(content);
+
+                            MyWebView.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        MyWebView.evaluateJavascript("APP.setSettings(JSON.parse(\"" + json.getJSONObject("client").toString().replace("\"", "\\\"") + "\"));", null);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        WriteTextFile(file, content);
+                        t.getEditText().setText("");
+                    }
+                    MyWebView.setVisibility(View.VISIBLE);
+                    t.setVisibility(View.GONE);
+                }
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * This function allows you to write content to a file.
+     * @param file
+     * @param data
+     * @throws IOException
+     */
+    public void WriteTextFile(File file, String data) throws IOException {
+        SharedPreferences.Editor editor = MySharedPreferences.edit();
+        editor.putString("settings", data); // add or overwrite someValue
+        editor.commit();
+        /*
+        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
+        BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
+        bufferedWriter.write(data);
+        bufferedWriter.close();
+         */
+    }
+
+    /**
+     * This function allows you to retrieve the contents of a file.
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    public String ReadTextFile(File file) throws IOException {
+        StringBuilder text = new StringBuilder();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = br.readLine()) != null) {
+                text.append(line);
+                text.append('\n');
+            }
+            br.close();
+        } catch (IOException e) { }
+        String result = text.toString();
+        return result;
     }
 }
