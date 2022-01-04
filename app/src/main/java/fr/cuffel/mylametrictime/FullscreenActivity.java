@@ -1,8 +1,10 @@
 package fr.cuffel.mylametrictime;
 
 import android.annotation.SuppressLint;
-import android.content.SharedPreferences;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.webkit.JavascriptInterface;
+import android.content.SharedPreferences;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
@@ -14,7 +16,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowInsets;
@@ -26,32 +27,27 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
-
 import com.google.android.material.textfield.TextInputLayout;
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import fr.cuffel.mylametrictime.databinding.ActivityFullscreenBinding;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.FileOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -89,36 +85,56 @@ public class FullscreenActivity extends AppCompatActivity {
                 os.close();
             }
             else if(httpExchange.getRequestMethod().equals("POST")){
-                String response = "Notification sended !";
-                httpExchange.sendResponseHeaders(200, response.length());//response code and length
+                if(httpExchange.getRequestURI().toString().equals(("/notification"))){
+                    String response = "Notification sended !";
 
-                // GET REQ BODY
-                InputStreamReader isr =  new InputStreamReader(httpExchange.getRequestBody() ,"utf-8");
-                BufferedReader br = new BufferedReader(isr);
-                int b;
-                StringBuilder buf = new StringBuilder();
-                while ((b = br.read()) != -1) {
-                    buf.append((char) b);
-                }
-                br.close();
-                isr.close();
+                    Headers headers = httpExchange.getRequestHeaders();
+                    if(headers.containsKey("api-key")){
+                        File file = new File(getFilesDir().getAbsolutePath() + "/My-LaMetric-Time-main/settings.json");
+                        String content = MySharedPreferences.getString("settings", ReadTextFile(file));
+                        try {
+                            JSONObject json = new JSONObject(content);
+                            if(json.getString("APIKey").equals(headers.getFirst("api-key"))){
+                                // GET REQ BODY
+                                InputStreamReader isr =  new InputStreamReader(httpExchange.getRequestBody() ,"utf-8");
+                                BufferedReader br = new BufferedReader(isr);
+                                int b;
+                                StringBuilder buf = new StringBuilder();
+                                while ((b = br.read()) != -1) {
+                                    buf.append((char) b);
+                                }
+                                br.close();
+                                isr.close();
 
-                try {
-                    JSONObject json = new JSONObject(buf.toString());
+                                try {
+                                    JSONObject notification_json = new JSONObject(buf.toString());
 
-                    MyWebView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            MyWebView.evaluateJavascript("APP.showNotification(JSON.parse(\"" + json.toString().replace("\"", "\\\"") + "\"));", null);
+                                    MyWebView.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            MyWebView.evaluateJavascript("APP.showNotification(JSON.parse(\"" + notification_json.toString().replace("\"", "\\\"") + "\"));", null);
+                                        }
+                                    });
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            else{
+                                response = "Wrong API key.";
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                    });
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                    }
+                    else{
+                        response = "An API key is required. You will find it in the \"settings.json\" file.";
+                    }
 
-                OutputStream os = httpExchange.getResponseBody();
-                os.write(response.getBytes());
-                os.close();
+                    OutputStream os = httpExchange.getResponseBody();
+                    httpExchange.sendResponseHeaders(200, response.length());//response code and length
+                    os.write(response.getBytes());
+                    os.close();
+                }
             }
         }
     };
@@ -217,6 +233,25 @@ public class FullscreenActivity extends AppCompatActivity {
                 TextView step1 = findViewById(R.id.step1);
                 step1.setTextColor(Green);
                 unpackZip(context.getFilesDir().getAbsolutePath() + "/", "main.zip");
+
+                try {
+                    File file = new File(getFilesDir().getAbsolutePath() + "/My-LaMetric-Time-main/settings.json");
+                    String settings = ReadTextFile(file);
+                    JSONObject json = new JSONObject(settings);
+
+                    // We generate the API key.
+                    json.put("APIKey",GeneratePassword(40));
+
+                    // We adjust the screen size in the settings
+                    DisplayMetrics displayMetrics = new DisplayMetrics();
+                    WindowManager wm = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+                    wm.getDefaultDisplay().getMetrics(displayMetrics);
+                    json.getJSONObject("client").put("DesiredScreenWidth", displayMetrics.widthPixels).put("DesiredScreenHeight", displayMetrics.heightPixels);
+
+                    SaveSettings(json.toString());
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -404,13 +439,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
             zis.close();
 
-            TextView step2 = findViewById(R.id.step2);
-            step2.setTextColor(Green);
-
             startServer(WebServerPort);
-
-            TextView step3 = findViewById(R.id.step3);
-            step3.setTextColor(Green);
 
             LoadURL("http://localhost:" + WebServerPort + "/index.html");
         }
@@ -421,6 +450,19 @@ public class FullscreenActivity extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    public static String GeneratePassword(int length) {
+        final Random RANDOM = new Random();
+        final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
+        final String NUMERIC = "0123456789";
+        final String DICTIONNARY = ALPHABET + ALPHABET.toUpperCase() + NUMERIC;
+        String result = "";
+        for (int i = 0; i < length; i++) {
+            int index = RANDOM.nextInt(DICTIONNARY.length());
+            result += DICTIONNARY.charAt(index);
+        }
+        return result;
     }
 
     /**
@@ -464,7 +506,7 @@ public class FullscreenActivity extends AppCompatActivity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        WriteTextFile(file, content);
+                        SaveSettings(content);
                         t.getEditText().setText("");
                     }
                     MyWebView.setVisibility(View.VISIBLE);
@@ -477,21 +519,14 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     /**
-     * This function allows you to write content to a file.
-     * @param file
+     * This function allows you to save your settings.
      * @param data
      * @throws IOException
      */
-    public void WriteTextFile(File file, String data) throws IOException {
+    public void SaveSettings(String data) throws IOException {
         SharedPreferences.Editor editor = MySharedPreferences.edit();
         editor.putString("settings", data); // add or overwrite someValue
         editor.commit();
-        /*
-        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
-        BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
-        bufferedWriter.write(data);
-        bufferedWriter.close();
-         */
     }
 
     /**

@@ -39,26 +39,11 @@
 
                 <TextView
                     android:id="@+id/step1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Download My LaMetric Tile from GitHub"
-                    android:textColor="#FFFFFF" />
-
-                <TextView
-                    android:id="@+id/step2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Unzip archive"
-                    android:textColor="#FFFFFF" />
-
-                <TextView
-                    android:id="@+id/step3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Start web server"
+                    android:gravity="center"
+                    android:text='Please wait, we are downloading "My LaMetric Time" from GitHub...'
                     android:textColor="#FFFFFF" />
 
             </LinearLayout>
