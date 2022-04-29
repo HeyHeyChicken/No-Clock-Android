@@ -43,7 +43,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text='Please wait, we are downloading "My LaMetric Time" from GitHub...'
+                    android:text='Please wait, we are downloading "No-Clock" from GitHub...'
                     android:textColor="#FFFFFF" />
 
             </LinearLayout>

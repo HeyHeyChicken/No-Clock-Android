@@ -73,7 +73,7 @@ public class FullscreenActivity extends AppCompatActivity {
         @Override
         public void handle(HttpExchange httpExchange) throws IOException {
             if(httpExchange.getRequestMethod().equals("GET")){
-                File f = new File(getFilesDir().getAbsolutePath() + "/My-LaMetric-Time-main/public" + httpExchange.getRequestURI().toString());
+                File f = new File(getFilesDir().getAbsolutePath() + "/No-Clock-main/public" + httpExchange.getRequestURI().toString());
                 FileInputStream fl = new FileInputStream(f);
                 byte[] arr = new byte[(int)f.length()];
                 fl.read(arr);
@@ -90,7 +90,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
                     Headers headers = httpExchange.getRequestHeaders();
                     if(headers.containsKey("api-key")){
-                        File file = new File(getFilesDir().getAbsolutePath() + "/My-LaMetric-Time-main/settings.json");
+                        File file = new File(getFilesDir().getAbsolutePath() + "/No-Clock-main/settings.json");
                         String content = MySharedPreferences.getString("settings", ReadTextFile(file));
                         try {
                             JSONObject json = new JSONObject(content);
@@ -235,7 +235,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 unpackZip(context.getFilesDir().getAbsolutePath() + "/", "main.zip");
 
                 try {
-                    File file = new File(getFilesDir().getAbsolutePath() + "/My-LaMetric-Time-main/settings.json");
+                    File file = new File(getFilesDir().getAbsolutePath() + "/No-Clock-main/settings.json");
                     String settings = ReadTextFile(file);
                     JSONObject json = new JSONObject(settings);
 
@@ -337,7 +337,7 @@ public class FullscreenActivity extends AppCompatActivity {
         File file = new File(getFilesDir().getAbsolutePath() + "/main.zip");
         if(!file.exists()){
             final DownloadTask downloadTask = new DownloadTask(this);
-            downloadTask.execute("https://github.com/HeyHeyChicken/My-LaMetric-Time/archive/refs/heads/main.zip");
+            downloadTask.execute("https://github.com/HeyHeyChicken/No-Clock/archive/refs/heads/main.zip");
         }
         else{
             TextView step1 = findViewById(R.id.step1);
@@ -470,7 +470,7 @@ public class FullscreenActivity extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
-        String path = getFilesDir().getAbsolutePath() + "/My-LaMetric-Time-main/settings.json";
+        String path = getFilesDir().getAbsolutePath() + "/No-Clock-main/settings.json";
         File file = new File(path);
         if(file.exists()){
             try {
