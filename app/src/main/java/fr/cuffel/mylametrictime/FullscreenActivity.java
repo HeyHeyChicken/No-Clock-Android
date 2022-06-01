@@ -77,7 +77,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 File f = new File(getFilesDir().getAbsolutePath() + "/No-Clock-main/public" + httpExchange.getRequestURI().toString());
                 FileInputStream fl = new FileInputStream(f);
                 byte[] arr = new byte[(int)f.length()];
-                fl.read(arr);
+                int nbBytes = fl.read(arr);
                 fl.close();
 
                 httpExchange.sendResponseHeaders(200, arr.length);//response code and length
