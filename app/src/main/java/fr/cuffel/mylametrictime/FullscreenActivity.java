@@ -68,6 +68,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private int Green = Color.parseColor("#FF4CAF50");
     private boolean IsSettingsPannelOpen = false;
     private SharedPreferences MySharedPreferences;
+    private final Random RANDOM = new Random();
 
     private HttpHandler rootHandler = new HttpHandler() {
         @Override
@@ -240,7 +241,7 @@ public class FullscreenActivity extends AppCompatActivity {
                     JSONObject json = new JSONObject(settings);
 
                     // We generate the API key.
-                    json.put("APIKey",GeneratePassword(40));
+                    json.put("APIKey",GeneratePassword(RANDOM, 40));
 
                     // We adjust the screen size in the settings
                     DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -452,14 +453,13 @@ public class FullscreenActivity extends AppCompatActivity {
         return true;
     }
 
-    public static String GeneratePassword(int length) {
-        final Random RANDOM = new Random();
+    public static String GeneratePassword(Random random, int length) {
         final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
         final String NUMERIC = "0123456789";
         final String DICTIONNARY = ALPHABET + ALPHABET.toUpperCase() + NUMERIC;
         String result = "";
         for (int i = 0; i < length; i++) {
-            int index = RANDOM.nextInt(DICTIONNARY.length());
+            int index = random.nextInt(DICTIONNARY.length());
             result += DICTIONNARY.charAt(index);
         }
         return result;
