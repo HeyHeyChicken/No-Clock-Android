@@ -35,7 +35,7 @@
 # Usage
 
 1) Launch the app on your device.
-2) You can access the settings file by pressing the back button on your anroid device.
+2) You can access the settings file by pressing the back button on your android device.
 Press back again to save.
 
 # Features
